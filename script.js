@@ -65,3 +65,93 @@ let engine = (id, serial, message) => {
 
 //   window.location("google.com");
 // }
+
+
+const formulario = document.getElementById("form");
+
+const userName = document.getElementById("username");
+const userEmail = document.getElementById("userEmail");
+
+const alertSuccess = document.getElementById("alertSuccess");
+const alertName = document.getElementById("alertName");
+const alertEmail = document.getElementById("alertEmail");
+
+
+
+const pintarMensajeError = (errores) => {
+    errores.forEach((item) => {
+        item.tipo.classList.remove("d-none");
+        item.tipo.textContent = item.msg;
+    });
+};
+
+formulario.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    alertSuccess.classList.add("d-none");
+    const errores = [];
+
+    let datos = new FormData(formulario)
+
+    peticion = {
+        method: 'POST',
+        body:datos,
+    }
+
+
+
+    // validar nombre
+    if (!userName.value || !userName.value.trim()) {
+        userName.classList.add("is-invalid");
+
+        errores.push({
+            tipo: alertName,
+            msg: "Formato no válido campo nombre, solo letras",
+        });
+    } else {
+        userName.classList.remove("is-invalid");
+        userName.classList.add("is-valid");
+        alertName.classList.add("d-none");
+        
+    }
+
+
+    // validar email
+    if (!userEmail.value || !userEmail.value.trim()) {
+        userEmail.classList.add("is-invalid");
+
+        errores.push({
+            tipo: alertEmail,
+            msg: "Escriba un correo válido",
+        });
+    } else {
+        userEmail.classList.remove("is-invalid");
+        userEmail.classList.add("is-valid");
+        alertEmail.classList.add("d-none");
+
+    }
+
+    if (errores.length !== 0) {
+        pintarMensajeError(errores);
+        return;
+    }
+
+
+    
+    pintarMensajeExito();
+    
+    fetch('recibe.php', peticion)
+        .then(respuesta => respuesta.json())
+        .then( respuesta => {
+        
+            console.log("Formulario enviado con éxito");
+        }).catch( error => console.log('error', error))
+
+   
+});
+
+//Para mostrar solo un msj en la pantalla
+const pintarMensajeExito = () => {
+  alertSuccess.classList.remove("d-none");
+  alertSuccess.textContent = "Mensaje enviado con éxito";
+};
